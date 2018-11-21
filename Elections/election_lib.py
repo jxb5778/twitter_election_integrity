@@ -11,6 +11,8 @@ from collections import Counter
 from polyglot.text import Text, Word
 #from polyglot.downloader import downloader
 #downloader.download(["sentiment2.nl"])
+
+from gensim.corpora.dictionary import Dictionary
 import pandas as pd
 import numpy as np
 import os
@@ -44,9 +46,8 @@ def key_value_split(source_dir, dest_dir, key_value):
 def tokenize_tweets(df):
     combine_tweets = ''
 
-    for index in range(1000):
-        tweet_text = df.iloc[index]['tweet_text']
-        combine_tweets = '{}\n{}'.format(combine_tweets, tweet_text)
+    for tweet in df['tweet_text']:
+        combine_tweets = '{}\n{}'.format(combine_tweets, tweet)
 
     return word_tokenize(combine_tweets)
 
@@ -76,5 +77,29 @@ def preprocess_tweet_tokens(tokens):
     # Remove tokens that are length 1
     token_buff.value = [t for t in token_buff.value if len(t) > 1]
 
-
     return token_buff.value
+
+
+def generate_tweet_bow(df):
+
+    tokens = tokenize_tweets(df)
+    processed_tokens = preprocess_tweet_tokens(tokens)
+
+    return Dictionary([processed_tokens])
+
+
+def generate_corpus(file_list):
+
+    token_list_master = []
+
+    for filename in file_list:
+        print(filename)
+        df = pd.read_csv(filename)
+        file_tokens = tokenize_tweets(df)
+        processed_tokens = preprocess_tweet_tokens(file_tokens)
+        token_list_master.append(processed_tokens)
+
+    dictionary = Dictionary(token_list_master)
+    corpus = [dictionary.doc2bow(token_list) for token_list in token_list_master]
+
+    return (dictionary, corpus)

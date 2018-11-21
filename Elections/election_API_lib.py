@@ -2,15 +2,18 @@ from Elections.election_lib import *
 
 
 def run_key_value_split(source_dir, dest_dir, key_value):
-    key_value_split(source_dir, dest_dir, key_value)
-    return
+    return key_value_split(source_dir, dest_dir, key_value)
 
 
-def generate_tweet_bow(tweet_file):
+def run_generate_tweet_bow(tweet_file):
 
     df = pd.read_csv(tweet_file)
 
-    tokens = tokenize_tweets(df)
-    processed_tokens = preprocess_tweet_tokens(tokens)
+    tweet_bow = generate_tweet_bow(df)
 
-    return Counter(processed_tokens)
+    return tweet_bow
+
+
+def run_generate_tweet_corpus(file_list):
+
+    return generate_corpus(file_list)
